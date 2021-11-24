@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/carousel",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "A slideshow component for cycling through images, slides, or another elements.",
   "type": "module",
   "main": "dist/Carousel.jsx",
