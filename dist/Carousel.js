@@ -287,11 +287,9 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
 }, { prefix: 'crsl' });
 export function CarouselItem(props) {
     // jsx:
-    return (<Element 
-    // other props:
-    {...props} 
-    // classes:
-    mainClass={props.mainClass ?? ''}/>);
+    return (React.createElement(Element, { ...props, 
+        // classes:
+        mainClass: props.mainClass ?? '' }));
 }
 export { CarouselItem as Item };
 export function Carousel(props) {
@@ -578,60 +576,52 @@ export function Carousel(props) {
         } // if
     };
     // jsx:
-    return (<Content 
-    // other props:
-    {...restProps} 
-    // classes:
-    mainClass={props.mainClass ?? sheet.main}>
-            {children && <>
-                <Element 
-        // essentials:
-        elmRef={(elm) => {
-                setRef(elmRef, elm);
-                if (!infiniteLoop)
-                    setRef(scrollRef, elm);
-                setRef(listRef, elm);
-            }} 
-        // semantics:
-        tag={itemsTag} role={itemsRole} semanticTag={itemsSemanticTagFn} semanticRole={itemsSemanticRoleFn} 
+    return (React.createElement(Content, { ...restProps, 
         // classes:
-        mainClass={itemsMainClass} classes={[...(itemsClasses ?? []),
-                'items',
-            ]} variantClasses={itemsVariantClasses} stateClasses={itemsStateClasses}>
-                {React.Children.map(children, (child, index) => (isTypeOf(child, CarouselItem)
+        mainClass: props.mainClass ?? sheet.main },
+        children && React.createElement(React.Fragment, null,
+            React.createElement(Element, { 
+                // essentials:
+                elmRef: (elm) => {
+                    setRef(elmRef, elm);
+                    if (!infiniteLoop)
+                        setRef(scrollRef, elm);
+                    setRef(listRef, elm);
+                }, 
+                // semantics:
+                tag: itemsTag, role: itemsRole, semanticTag: itemsSemanticTagFn, semanticRole: itemsSemanticRoleFn, 
+                // classes:
+                mainClass: itemsMainClass, classes: [...(itemsClasses ?? []),
+                    'items',
+                ], variantClasses: itemsVariantClasses, stateClasses: itemsStateClasses }, React.Children.map(children, (child, index) => (isTypeOf(child, CarouselItem)
                 ?
-                    <child.type 
+                    React.createElement(child.type
                     // other props:
-                    {...child.props} 
-                    // essentials:
-                    key={child.key ?? index} 
-                    // semantics:
-                    tag={child.props.tag ?? itemTag} role={child.props.role ?? itemRole} semanticTag={child.props.semanticTag ?? itemSemanticTagFn} semanticRole={child.props.semanticRole ?? itemSemanticRoleFn} 
-                    // classes:
-                    mainClass={itemMainClass} classes={itemClasses} variantClasses={itemVariantClasses} stateClasses={itemStateClasses}/>
+                    , { ...child.props, 
+                        // essentials:
+                        key: child.key ?? index, 
+                        // semantics:
+                        tag: child.props.tag ?? itemTag, role: child.props.role ?? itemRole, semanticTag: child.props.semanticTag ?? itemSemanticTagFn, semanticRole: child.props.semanticRole ?? itemSemanticRoleFn, 
+                        // classes:
+                        mainClass: itemMainClass, classes: itemClasses, variantClasses: itemVariantClasses, stateClasses: itemStateClasses })
                 :
-                    <CarouselItem 
+                    React.createElement(CarouselItem
                     // essentials:
-                    key={index} 
-                    // semantics:
-                    tag={itemTag} role={itemRole} semanticTag={itemSemanticTagFn} semanticRole={itemSemanticRoleFn}>
-                        {child}
-                    </CarouselItem>))}
-                </Element>
-                
-                {infiniteLoop && <Element 
-            // essentials:
-            elmRef={(elm) => {
+                    , { 
+                        // essentials:
+                        key: index, 
+                        // semantics:
+                        tag: itemTag, role: itemRole, semanticTag: itemSemanticTagFn, semanticRole: itemSemanticRoleFn }, child)))),
+            infiniteLoop && React.createElement(Element, { 
+                // essentials:
+                elmRef: (elm) => {
                     setRef(scrollRef, elm);
                     setRef(listDummyRef, elm);
-                }} 
-            // semantics:
-            aria-hidden={true} // just a dummy element, no meaningful content here
-             
-            // classes:
-            mainClass='items dummy' 
-            // events:
-            onScroll={(e) => {
+                }, "aria-hidden": true, 
+                // classes:
+                mainClass: 'items dummy', 
+                // events:
+                onScroll: (e) => {
                     const diff = dummyDiff.current;
                     if (!diff)
                         return; // no difference => nothing to do
@@ -644,123 +634,113 @@ export function Carousel(props) {
                     if (dummyElm.scrollLeft % step)
                         return; // not an exact step => scrolling is still in progress => abort
                     normalizeScrollItems(itemsElm);
-                }}>
-                {React.Children.map(children, (child, index) => (<div 
+                } }, React.Children.map(children, (child, index) => (React.createElement("div", { 
                 // essentials:
-                key={index}>
-                    </div>))}
-                </Element>}
-            </>}
-            
-            {
+                key: index }))))),
         //#region has class prevBtn
         isTypeOf(prevBtn, Element)
             &&
                 prevBtn.props.classes?.includes('prevBtn')
             //#endregion has class prevBtn
             ?
-                <prevBtn.type 
+                React.createElement(prevBtn.type
                 // other props:
-                {...prevBtn.props} 
-                // events:
-                onClick={(e) => {
+                , { ...prevBtn.props, 
+                    // events:
+                    onClick: (e) => {
                         prevBtn.props.onClick?.(e);
                         handlePrev(e);
-                    }}/>
+                    } })
             :
-                <NavButton 
+                React.createElement(NavButton
                 // classes:
-                classes={[
+                , { 
+                    // classes:
+                    classes: [
                         'prevBtn',
-                    ]} 
-                // accessibilities:
-                label='Previous' 
-                // appearances:
-                icon='prev' 
-                // events:
-                onClick={handlePrev}>
-                    {prevBtn}
-                </NavButton>}
-            
-            {
+                    ], 
+                    // accessibilities:
+                    label: 'Previous', 
+                    // appearances:
+                    icon: 'prev', 
+                    // events:
+                    onClick: handlePrev }, prevBtn),
         //#region has class nextBtn
         isTypeOf(nextBtn, Element)
             &&
                 nextBtn.props.classes?.includes('nextBtn')
             //#endregion has class nextBtn
             ?
-                <nextBtn.type 
+                React.createElement(nextBtn.type
                 // other props:
-                {...nextBtn.props} 
-                // events:
-                onClick={(e) => {
+                , { ...nextBtn.props, 
+                    // events:
+                    onClick: (e) => {
                         nextBtn.props.onClick?.(e);
                         handleNext(e);
-                    }}/>
+                    } })
             :
-                <NavButton 
+                React.createElement(NavButton
                 // classes:
-                classes={[
+                , { 
+                    // classes:
+                    classes: [
                         'nextBtn',
-                    ]} 
-                // accessibilities:
-                label='Next' 
-                // appearances:
-                icon='next' 
-                // events:
-                onClick={handleNext}>
-                    {nextBtn}
-                </NavButton>}
-            
-            {nav
+                    ], 
+                    // accessibilities:
+                    label: 'Next', 
+                    // appearances:
+                    icon: 'next', 
+                    // events:
+                    onClick: handleNext }, nextBtn),
+        nav
             ?
                 (isTypeOf(nav, Element)
                     ?
-                        <nav.type 
+                        React.createElement(nav.type
                         // other props:
-                        {...nav.props} 
-                        // essentials:
-                        key={nav.key} 
-                        // classes:
-                        classes={[...(nav.props.classes ?? []),
+                        , { ...nav.props, 
+                            // essentials:
+                            key: nav.key, 
+                            // classes:
+                            classes: [...(nav.props.classes ?? []),
                                 'nav', // inject nav class
-                            ]} {...(isTypeOf(nav, Navscroll) ? {
-                            // scrolls:
-                            targetRef: nav.props.targetRef ?? (infiniteLoop ? listDummyRef : listRef),
-                            interpolation: nav.props.interpolation ?? true,
-                        } : {})}/>
+                            ], ...(isTypeOf(nav, Navscroll) ? {
+                                // scrolls:
+                                targetRef: nav.props.targetRef ?? (infiniteLoop ? listDummyRef : listRef),
+                                interpolation: nav.props.interpolation ?? true,
+                            } : {}) })
                     :
                         nav)
             :
-                <Navscroll 
+                React.createElement(Navscroll
                 // variants:
-                theme={props.theme} size={props.size} listStyle='bullet' orientation='inline' 
-                // behaviors:
-                actionCtrl={true} 
-                // classes:
-                classes={[
+                , { 
+                    // variants:
+                    theme: props.theme, size: props.size, listStyle: 'bullet', orientation: 'inline', 
+                    // behaviors:
+                    actionCtrl: true, 
+                    // classes:
+                    classes: [
                         'nav', // inject nav class
-                    ]} 
-                // scrolls:
-                targetRef={(infiniteLoop ? listDummyRef : listRef)} interpolation={true}>
-                    {React.Children.map(children, (child, index) => (<NavscrollItem 
+                    ], 
+                    // scrolls:
+                    targetRef: (infiniteLoop ? listDummyRef : listRef), interpolation: true }, React.Children.map(children, (child, index) => (React.createElement(NavscrollItem
+                // essentials:
+                , { 
                     // essentials:
-                    key={index} 
+                    key: index, 
                     // semantics:
-                    tag='button' 
-                    // accessibilities:
-                    {...(React.isValidElement(child) ? {
+                    tag: 'button', ...(React.isValidElement(child) ? {
                         title: child.props.title,
-                    } : {})}/>))}
-                </Navscroll>}
-        </Content>);
+                    } : {}) }))))));
 }
 export { Carousel as default };
 function NavButton(props) {
     // jsx:
-    return (<ButtonIcon 
+    return (React.createElement(ButtonIcon
     // other props:
-    {...props} 
-    // variants:
-    size={props.size ?? 'lg'} gradient={props.gradient ?? true} btnStyle={props.btnStyle ?? 'ghost'}/>);
+    , { ...props, 
+        // variants:
+        size: props.size ?? 'lg', gradient: props.gradient ?? true, btnStyle: props.btnStyle ?? 'ghost' }));
 }
