@@ -494,6 +494,7 @@ export function Carousel(props) {
             const dummyElm = listDummyRef.current;
             const itemsElm = listRef.current;
             if (infiniteLoop && dummyElm) {
+                let itemsShifted = false;
                 if (itemsElm && isBeginOfScroll(itemsElm)) {
                     // move the last item to the first:
                     const item = itemsElm.lastElementChild;
@@ -501,19 +502,28 @@ export function Carousel(props) {
                         // remember the current scrollPos before modifying:
                         const scrollPos = itemsElm.scrollLeft;
                         itemsElm.insertBefore(item, itemsElm.firstElementChild); // insert the items at the beginning
+                        itemsShifted = true;
                         // set the current scrollPos to the next item, so the scrolling effect can occur:
                         itemsElm.scrollTo({ left: (scrollPos + itemsElm.clientWidth), behavior: 'instant' }); // no scrolling animation during sync
                     } // if
                     // calculate the diff of itemsElm & dummyElm:
                     setDummyDiff(-1);
                 } // if
-                if (isBeginOfScroll(dummyElm)) {
-                    // scroll to last:
-                    scrollTo(dummyElm.lastElementChild);
+                const doScroll = () => {
+                    if (isBeginOfScroll(dummyElm)) {
+                        // scroll to last:
+                        scrollTo(dummyElm.lastElementChild);
+                    }
+                    else {
+                        // scroll to previous:
+                        scrollBy(dummyElm, false);
+                    } // if
+                };
+                if (itemsShifted) {
+                    setTimeout(doScroll, 0); // wait until scrolling shift completed and then doScroll()
                 }
                 else {
-                    // scroll to previous:
-                    scrollBy(dummyElm, false);
+                    doScroll();
                 } // if
                 // all necessary task has been performed, no further action needed:
                 e.preventDefault();
@@ -537,6 +547,7 @@ export function Carousel(props) {
             const dummyElm = listDummyRef.current;
             const itemsElm = listRef.current;
             if (infiniteLoop && dummyElm) {
+                let itemsShifted = false;
                 if (itemsElm && isEndOfScroll(itemsElm)) {
                     // move the first item to the last:
                     const item = itemsElm.firstElementChild;
@@ -544,19 +555,28 @@ export function Carousel(props) {
                         // remember the current scrollPos before modifying:
                         const scrollPos = itemsElm.scrollLeft;
                         itemsElm.append(item); // insert the items at the end
+                        itemsShifted = true;
                         // set the current scrollPos to the prev item, so the scrolling effect can occur:
                         itemsElm.scrollTo({ left: (scrollPos - itemsElm.clientWidth), behavior: 'instant' }); // no scrolling animation during sync
                     } // if
                     // calculate the diff of itemsElm & dummyElm:
                     setDummyDiff(1);
                 } // if
-                if (isEndOfScroll(dummyElm)) {
-                    // scroll to first:
-                    scrollTo(dummyElm.firstElementChild);
+                const doScroll = () => {
+                    if (isEndOfScroll(dummyElm)) {
+                        // scroll to first:
+                        scrollTo(dummyElm.firstElementChild);
+                    }
+                    else {
+                        // scroll to next:
+                        scrollBy(dummyElm, true);
+                    } // if
+                };
+                if (itemsShifted) {
+                    setTimeout(doScroll, 0); // wait until scrolling shift completed and then doScroll()
                 }
                 else {
-                    // scroll to next:
-                    scrollBy(dummyElm, true);
+                    doScroll();
                 } // if
                 // all necessary task has been performed, no further action needed:
                 e.preventDefault();
