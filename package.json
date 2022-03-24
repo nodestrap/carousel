@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/carousel",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "description": "A slideshow component for cycling through images, slides, or another elements.",
   "type": "module",
   "main": "dist/Carousel.js",
@@ -30,18 +30,17 @@
   },
   "homepage": "https://github.com/nodestrap/carousel#readme",
   "dependencies": {
-    "@cssfn/css-config": "^1.0.4",
-    "@cssfn/cssfn": "^1.0.11",
+    "@cssfn/css-config": "^1.0.8",
+    "@cssfn/cssfn": "^1.0.12",
     "@cssfn/react-cssfn": "^1.0.11",
-    "@cssfn/types": "^1.0.4",
     "@nodestrap/basic": "^4.0.7",
     "@nodestrap/button-icon": "^4.0.4",
-    "@nodestrap/content": "^4.0.10",
+    "@nodestrap/content": "^4.0.13",
     "@nodestrap/element": "^4.0.7",
-    "@nodestrap/navscroll": "^4.0.4",
+    "@nodestrap/navscroll": "^4.0.6",
     "@nodestrap/stripouts": "^4.0.2",
     "@nodestrap/utilities": "^4.0.3",
-    "@types/react": "^17.0.39",
+    "@types/react": "^17.0.42",
     "react": "^17.0.2"
   }
 }

@@ -1,12 +1,13 @@
 // react:
 import { default as React, useRef, useEffect, } from 'react'; // base technology of our nodestrap components
+// cssfn:
 import { 
 // compositions:
 mainComposition, 
 // styles:
 style, imports, 
 // rules:
-rule, 
+rule, fallbacks, 
 //combinators:
 children, } from '@cssfn/cssfn'; // cssfn core
 import { 
@@ -19,11 +20,9 @@ usesGeneralProps, usesPrefixedProps, usesSuffixedProps, overwriteProps, } from '
 import { stripoutList, stripoutScrollbar, stripoutImage, } from '@nodestrap/stripouts';
 import { 
 // utilities:
-isTypeOf, setRef, } from '@nodestrap/utilities';
+setRef, } from '@nodestrap/utilities';
 // nodestrap components:
-import { 
-// hooks:
-useTestSemantic, Element, } from '@nodestrap/element';
+import { Element, } from '@nodestrap/element';
 import { 
 // hooks:
 usesSizeVariant, usesPadding, expandPadding, } from '@nodestrap/basic';
@@ -125,8 +124,19 @@ export const usesCarouselMediaLayout = () => {
         ]),
         ...style({
             // layouts:
-            ...rule(':first-child:last-child', {
-                display: 'block', // fills the entire parent's width
+            ...rule(':where(:first-child:last-child)', {
+                display: 'block',
+                // sizes:
+                // span to maximum width/height while keeps aspect-ratio:
+                boxSizing: 'border-box',
+                maxInlineSize: 'fill-available',
+                maxBlockSize: 'fill-available',
+                ...fallbacks({
+                    maxInlineSize: '100%',
+                    maxBlockSize: '100%',
+                }),
+                inlineSize: 'auto',
+                blockSize: 'auto',
             }),
             // customize:
             ...usesGeneralProps(usesPrefixedProps(cssProps, 'media')), // apply general cssProps starting with media***
@@ -268,13 +278,10 @@ export const [cssProps, cssDecls, cssVals, cssConfig] = createCssConfig(() => {
         //#endregion borders
     };
 }, { prefix: 'crsl' });
-export function CarouselItem(props) {
+function CarouselItem(props) {
     // jsx:
-    return (React.createElement(Element, { ...props, 
-        // classes:
-        mainClass: props.mainClass ?? '' }));
+    return (React.createElement(Element, { ...props }));
 }
-export { CarouselItem as Item };
 export function Carousel(props) {
     // styles:
     const sheet = useCarouselSheet();
@@ -285,21 +292,19 @@ export function Carousel(props) {
     const { 
     // essentials:
     elmRef, scrollRef, 
-    // semantics:
-    itemsTag, itemTag, itemsRole, itemRole, itemsSemanticTag, itemSemanticTag, itemsSemanticRole, itemSemanticRole, 
-    // classes:
-    itemsMainClass, itemsClasses, itemsVariantClasses, itemsStateClasses, itemMainClass, itemClasses, itemVariantClasses, itemStateClasses, 
+    // components:
+    prevBtn = React.createElement(NavButton, null), nextBtn = React.createElement(NavButton, null), nav = React.createElement(Navscroll, { listStyle: 'bullet', orientation: 'inline' }), 
     // children:
-    children, prevBtn, nextBtn, nav, ...restProps } = props;
+    children, ...restCarouselProps } = props;
+    const { 
+    // layouts:
+    size, 
+    // orientation,
+    // nude,
+    // colors:
+    theme, gradient, outlined, mild, } = restCarouselProps;
     // fn props:
     const itemsTotal = React.Children.count(children);
-    const listTag = ['ul', 'ol'];
-    const listRole = 'list';
-    const itemsSemanticTagFn = itemsSemanticTag ?? listTag;
-    const itemsSemanticRoleFn = itemsSemanticRole ?? listRole;
-    const [, , isList, isSemanticList] = useTestSemantic({ tag: itemsTag, role: itemsRole, semanticTag: itemsSemanticTagFn, semanticRole: itemsSemanticRoleFn }, { semanticTag: listTag, semanticRole: listRole });
-    const itemSemanticTagFn = itemSemanticTag ?? (isSemanticList ? 'li' : [null]);
-    const itemSemanticRoleFn = itemSemanticRole ?? (isList ? 'listitem' : [null]);
     // dom effects:
     const listRef = useRef(null);
     const listDummyRef = useRef(null);
@@ -579,7 +584,58 @@ export function Carousel(props) {
         } // if
     };
     // jsx:
-    return (React.createElement(Content, { ...restProps, 
+    const defaultComponentProps = {
+        // variants:
+        // layouts:
+        size: size,
+        // orientation : orientation,
+        // nude        : nude,
+        // colors:
+        theme: theme,
+        gradient: gradient,
+        outlined: outlined,
+        mild: mild,
+    };
+    const defaultPrevBtnProps = {
+        // classes:
+        classes: [
+            'prevBtn',
+        ],
+        // accessibilities:
+        label: 'Previous',
+        // appearances:
+        icon: 'prev',
+        // events:
+        onClick: handlePrev,
+        // others:
+        ...defaultComponentProps,
+    };
+    const defaultNextBtnProps = {
+        // classes:
+        classes: [
+            'nextBtn',
+        ],
+        // accessibilities:
+        label: 'Next',
+        // appearances:
+        icon: 'next',
+        // events:
+        onClick: handleNext,
+        // others:
+        ...defaultComponentProps,
+    };
+    const defaultNavscrollProps = {
+        // classes:
+        classes: [
+            'nav',
+        ],
+        // scrolls:
+        targetRef: (infiniteLoop ? listDummyRef : listRef),
+        interpolation: true,
+        // others:
+        ...defaultComponentProps,
+    };
+    return (React.createElement(Content, { ...restCarouselProps, 
         // classes:
         mainClass: props.mainClass ?? sheet.main },
         children && React.createElement(React.Fragment, null,
@@ -592,29 +648,17 @@ export function Carousel(props) {
                     setRef(listRef, elm);
                 }, 
                 // semantics:
-                tag: itemsTag, role: itemsRole, semanticTag: itemsSemanticTagFn, semanticRole: itemsSemanticRoleFn, 
+                semanticTag: ['ul', 'ol'], semanticRole: 'list', 
                 // classes:
-                mainClass: itemsMainClass, classes: [...(itemsClasses ?? []),
+                classes: [
                     'items',
-                ], variantClasses: itemsVariantClasses, stateClasses: itemsStateClasses }, React.Children.map(children, (child, index) => (isTypeOf(child, CarouselItem)
-                ?
-                    React.createElement(child.type
-                    // other props:
-                    , { ...child.props, 
-                        // essentials:
-                        key: child.key ?? index, 
-                        // semantics:
-                        tag: child.props.tag ?? itemTag, role: child.props.role ?? itemRole, semanticTag: child.props.semanticTag ?? itemSemanticTagFn, semanticRole: child.props.semanticRole ?? itemSemanticRoleFn, 
-                        // classes:
-                        mainClass: itemMainClass, classes: itemClasses, variantClasses: itemVariantClasses, stateClasses: itemStateClasses })
-                :
-                    React.createElement(CarouselItem
-                    // essentials:
-                    , { 
-                        // essentials:
-                        key: index, 
-                        // semantics:
-                        tag: itemTag, role: itemRole, semanticTag: itemSemanticTagFn, semanticRole: itemSemanticRoleFn }, child)))),
+                ] }, React.Children.map(children, (child, index) => (React.createElement(CarouselItem
+            // essentials:
+            , { 
+                // essentials:
+                key: index, 
+                // semantics:
+                semanticTag: 'li', semanticRole: 'listitem' }, child)))),
             infiniteLoop && React.createElement(Element, { 
                 // essentials:
                 elmRef: (elm) => {
@@ -640,103 +684,17 @@ export function Carousel(props) {
                 } }, React.Children.map(children, (child, index) => (React.createElement("div", { 
                 // essentials:
                 key: index }))))),
-        //#region has class prevBtn
-        isTypeOf(prevBtn, Element)
-            &&
-                prevBtn.props.classes?.includes('prevBtn')
-            //#endregion has class prevBtn
-            ?
-                React.createElement(prevBtn.type
-                // other props:
-                , { ...prevBtn.props, 
-                    // events:
-                    onClick: (e) => {
-                        prevBtn.props.onClick?.(e);
-                        handlePrev(e);
-                    } })
-            :
-                React.createElement(NavButton
-                // classes:
-                , { 
-                    // classes:
-                    classes: [
-                        'prevBtn',
-                    ], 
-                    // accessibilities:
-                    label: 'Previous', 
-                    // appearances:
-                    icon: 'prev', 
-                    // events:
-                    onClick: handlePrev }, prevBtn),
-        //#region has class nextBtn
-        isTypeOf(nextBtn, Element)
-            &&
-                nextBtn.props.classes?.includes('nextBtn')
-            //#endregion has class nextBtn
-            ?
-                React.createElement(nextBtn.type
-                // other props:
-                , { ...nextBtn.props, 
-                    // events:
-                    onClick: (e) => {
-                        nextBtn.props.onClick?.(e);
-                        handleNext(e);
-                    } })
-            :
-                React.createElement(NavButton
-                // classes:
-                , { 
-                    // classes:
-                    classes: [
-                        'nextBtn',
-                    ], 
-                    // accessibilities:
-                    label: 'Next', 
-                    // appearances:
-                    icon: 'next', 
-                    // events:
-                    onClick: handleNext }, nextBtn),
-        nav
-            ?
-                (isTypeOf(nav, Element)
-                    ?
-                        React.createElement(nav.type
-                        // other props:
-                        , { ...nav.props, 
-                            // essentials:
-                            key: nav.key, 
-                            // classes:
-                            classes: [...(nav.props.classes ?? []),
-                                'nav', // inject nav class
-                            ], ...(isTypeOf(nav, Navscroll) ? {
-                                // scrolls:
-                                targetRef: nav.props.targetRef ?? (infiniteLoop ? listDummyRef : listRef),
-                                interpolation: nav.props.interpolation ?? true,
-                            } : {}) })
-                    :
-                        nav)
-            :
-                React.createElement(Navscroll
-                // variants:
-                , { 
-                    // variants:
-                    theme: props.theme, size: props.size, listStyle: 'bullet', orientation: 'inline', 
-                    // behaviors:
-                    actionCtrl: true, 
-                    // classes:
-                    classes: [
-                        'nav', // inject nav class
-                    ], 
-                    // scrolls:
-                    targetRef: (infiniteLoop ? listDummyRef : listRef), interpolation: true }, React.Children.map(children, (child, index) => (React.createElement(NavscrollItem
-                // essentials:
-                , { 
-                    // essentials:
-                    key: index, 
-                    // semantics:
-                    tag: 'button', ...(React.isValidElement(child) ? {
-                        title: child.props.title,
-                    } : {}) }))))));
+        React.cloneElement(React.cloneElement(prevBtn, defaultPrevBtnProps), (!prevBtn.props.onClick ? prevBtn.props : { ...prevBtn.props, onClick: (e) => { prevBtn.props.onClick?.(e); defaultPrevBtnProps.onClick?.(e); } })),
+        React.cloneElement(React.cloneElement(nextBtn, defaultNextBtnProps), (!nextBtn.props.onClick ? nextBtn.props : { ...nextBtn.props, onClick: (e) => { nextBtn.props.onClick?.(e); defaultNextBtnProps.onClick?.(e); } })),
+        React.cloneElement(React.cloneElement(nav, defaultNavscrollProps, React.Children.map(children, (child, index) => (React.createElement(NavscrollItem
+        // essentials:
+        , { 
+            // essentials:
+            key: index, 
+            // semantics:
+            tag: 'button', ...(React.isValidElement(child) ? {
+                title: child.props.title,
+            } : {}) })))), nav.props)));
 }
 export { Carousel as default };
 function NavButton(props) {
