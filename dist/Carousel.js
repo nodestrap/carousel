@@ -94,7 +94,7 @@ export const usesCarouselItemLayout = (options = {}) => {
     return style({
         // layouts:
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         flexWrap: 'nowrap',
@@ -137,6 +137,8 @@ export const usesCarouselMediaLayout = () => {
                 inlineSize: 'auto',
                 blockSize: 'auto',
             }),
+            // sizes:
+            flex: [[0, 0, 'auto']],
             // customize:
             ...usesGeneralProps(usesPrefixedProps(cssProps, 'media')), // apply general cssProps starting with media***
         }),
