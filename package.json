@@ -1,6 +1,6 @@
 {
   "name": "@nodestrap/carousel",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "description": "A slideshow component for cycling through images, slides, or another elements.",
   "type": "module",
   "main": "dist/Carousel.js",
@@ -35,12 +35,12 @@
     "@cssfn/react-cssfn": "^1.0.11",
     "@nodestrap/basic": "^4.0.7",
     "@nodestrap/button-icon": "^4.0.4",
-    "@nodestrap/content": "^4.0.13",
+    "@nodestrap/content": "^4.0.14",
     "@nodestrap/element": "^4.0.7",
     "@nodestrap/navscroll": "^4.0.6",
     "@nodestrap/stripouts": "^4.0.2",
     "@nodestrap/utilities": "^4.0.3",
-    "@types/react": "^17.0.42",
+    "@types/react": "^17.0.43",
     "react": "^17.0.2"
   }
 }

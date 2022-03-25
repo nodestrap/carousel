@@ -26,9 +26,7 @@ import { Element, } from '@nodestrap/element';
 import { 
 // hooks:
 usesSizeVariant, usesPadding, expandPadding, } from '@nodestrap/basic';
-import { 
-// styles:
-usesContentLayout, usesContentVariants, 
+import { usesContentChildrenOptions, usesContentLayout, usesContentVariants, 
 // configs:
 cssProps as ccssProps, Content, } from '@nodestrap/content';
 import { ButtonIcon, } from '@nodestrap/button-icon';
@@ -43,15 +41,14 @@ export const useCarouselVariant = (props) => {
     };
 };
 // styles:
-const itemsElm = '.items'; // `.items` is the slideList
+// .carousel > .items > .item > .media
+const itemsElm = ':where(.items)'; // zero specificity
 const dummyElm = '.dummy';
-// const itemElm    = ['li', '*'];  // poor specificity // any children inside the slideList are slideItem
-const itemElm = ':nth-child(n)'; // better specificity // any children inside the slideList are slideItem
-const mediaElm = ['figure', 'img', 'svg', 'video', '.media'];
+const itemElm = '*'; // zero specificity
 const prevBtnElm = '.prevBtn';
 const nextBtnElm = '.nextBtn';
 const navElm = '.nav';
-export const usesCarouselItemsLayout = () => {
+export const usesCarouselItemsLayout = (options = {}) => {
     // dependencies:
     // spacings:
     const [, paddingRefs] = usesPadding();
@@ -83,7 +80,7 @@ export const usesCarouselItemsLayout = () => {
             // children:
             ...children(itemElm, {
                 ...imports([
-                    usesCarouselItemLayout(),
+                    usesCarouselItemLayout(options),
                 ]),
             }),
             // customize:
@@ -91,7 +88,9 @@ export const usesCarouselItemsLayout = () => {
         }),
     });
 };
-export const usesCarouselItemLayout = () => {
+export const usesCarouselItemLayout = (options = {}) => {
+    // options:
+    const { mediaSelectorWithExcept, } = usesContentChildrenOptions(options);
     return style({
         // layouts:
         display: 'flex',
@@ -108,7 +107,7 @@ export const usesCarouselItemLayout = () => {
         scrollSnapAlign: 'center',
         scrollSnapStop: 'normal',
         // children:
-        ...children(mediaElm, {
+        ...children(mediaSelectorWithExcept, {
             ...imports([
                 usesCarouselMediaLayout(),
             ]),
@@ -175,7 +174,7 @@ export const usesNavLayout = () => {
         ...usesGeneralProps(usesPrefixedProps(cssProps, 'nav')), // apply general cssProps starting with nav***
     });
 };
-export const usesCarouselLayout = () => {
+export const usesCarouselLayout = (options = {}) => {
     return style({
         ...imports([
             // layouts:
@@ -202,7 +201,7 @@ export const usesCarouselLayout = () => {
             // children:
             ...children(itemsElm, {
                 ...imports([
-                    usesCarouselItemsLayout(),
+                    usesCarouselItemsLayout(options),
                 ]),
             }),
             ...children(dummyElm, {
@@ -293,14 +292,14 @@ export function Carousel(props) {
     // essentials:
     elmRef, scrollRef, 
     // components:
-    prevBtn = React.createElement(NavButton, null), nextBtn = React.createElement(NavButton, null), nav = React.createElement(Navscroll, { listStyle: 'bullet', orientation: 'inline' }), 
+    prevBtn = React.createElement(ButtonIcon, { size: 'lg', nude: false, gradient: true, outlined: false, btnStyle: 'ghost' }), nextBtn = React.createElement(ButtonIcon, { size: 'lg', nude: false, gradient: true, outlined: false, btnStyle: 'ghost' }), nav = React.createElement(Navscroll, { orientation: 'inline', nude: false, mild: true, listStyle: 'bullet' }), 
     // children:
     children, ...restCarouselProps } = props;
     const { 
     // layouts:
     size, 
     // orientation,
-    // nude,
+    nude, 
     // colors:
     theme, gradient, outlined, mild, } = restCarouselProps;
     // fn props:
@@ -589,7 +588,7 @@ export function Carousel(props) {
         // layouts:
         size: size,
         // orientation : orientation,
-        // nude        : nude,
+        nude: nude,
         // colors:
         theme: theme,
         gradient: gradient,
@@ -697,11 +696,3 @@ export function Carousel(props) {
             } : {}) })))), nav.props)));
 }
 export { Carousel as default };
-function NavButton(props) {
-    // jsx:
-    return (React.createElement(ButtonIcon
-    // other props:
-    , { ...props, 
-        // variants:
-        size: props.size ?? 'lg', gradient: props.gradient ?? true, btnStyle: props.btnStyle ?? 'ghost' }));
-}
